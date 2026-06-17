@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>관리자 대시보드 | Web Design Portfolio</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      body {
+        min-height: 100vh;
+      }
+
+      .login-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: rgba(247, 247, 244, 0.92);
+        backdrop-filter: blur(18px);
+      }
+
+      .login-screen.is-hidden {
+        display: none;
+      }
+
+      .login-card,
+      .admin-card,
+      .admin-table,
+      .summary-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.76);
+        box-shadow: 0 18px 54px rgba(29, 29, 31, 0.08);
+      }
+
+      .login-card {
+        width: min(420px, 100%);
+        padding: 28px;
+      }
+
+      .login-card h1 {
+        margin: 0 0 10px;
+        font-size: 34px;
+      }
+
+      .login-card p,
+      .admin-note,
+      .admin-status {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .admin-page {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 110px 0 64px;
+      }
+
+      .admin-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: end;
+        margin-bottom: 28px;
+      }
+
+      .admin-top h1 {
+        margin: 0;
+        font-size: clamp(36px, 5vw, 64px);
+      }
+
+      .admin-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .admin-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+        padding: 6px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.6);
+        width: fit-content;
+      }
+
+      .admin-tabs button {
+        min-height: 40px;
+        border: 0;
+        border-radius: 999px;
+        padding: 0 16px;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .admin-tabs button.is-active {
+        color: var(--text);
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(29, 29, 31, 0.08);
+      }
+
+      .admin-panel {
+        display: none;
+      }
+
+      .admin-panel.is-active {
+        display: block;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .summary-card {
+        min-height: 130px;
+        padding: 20px;
+      }
+
+      .summary-card span {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .summary-card strong {
+        display: block;
+        margin-top: 18px;
+        font-size: 34px;
+      }
+
+      .admin-grid {
+        display: grid;
+        grid-template-columns: 0.82fr 1.18fr;
+        gap: 18px;
+      }
+
+      .admin-card {
+        padding: 20px;
+      }
+
+      .admin-card h2 {
+        margin: 0 0 18px;
+        font-size: 24px;
+      }
+
+      .admin-form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .admin-form label {
+        display: grid;
+        gap: 8px;
+      }
+
+      .admin-form .inline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .admin-form span,
+      .table-label {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .admin-form input,
+      .admin-form select,
+      .admin-form textarea {
+        width: 100%;
+        border: 1px solid rgba(17, 17, 18, 0.1);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.86);
+        color: var(--text);
+        font: inherit;
+        font-size: 15px;
+        outline: none;
+      }
+
+      .admin-form input,
+      .admin-form select {
+        height: 48px;
+        padding: 0 14px;
+      }
+
+      .admin-form textarea {
+        min-height: 104px;
+        resize: vertical;
+        padding: 14px;
+      }
+
+      .admin-form input[type="file"],
+      .admin-form input[type="checkbox"] {
+        height: auto;
+      }
+
+      .admin-form input[type="file"] {
+        padding: 11px 14px;
+      }
+
+      .admin-table {
+        overflow: hidden;
+      }
+
+      .table-row {
+        display: grid;
+        gap: 16px;
+        padding: 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .table-row:last-child {
+        border-bottom: 0;
+      }
+
+      .work-row {
+        grid-template-columns: 92px 1fr auto;
+        align-items: center;
+      }
+
+      .lead-row {
+        grid-template-columns: 150px 1fr 150px 150px;
+      }
+
+      .category-row,
+      .activity-row,
+      .source-row,
+      .popular-row {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+
+      .table-row strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .table-row span,
+      .table-row p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .work-row img {
+        width: 92px;
+        height: 126px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: #ecebe6;
+      }
+
+      .row-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .mini-button {
+        min-height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        padding: 0 12px;
+        color: var(--text);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        border-radius: 999px;
+        padding: 0 10px;
+        background: rgba(10, 132, 255, 0.1);
+        color: var(--accent-dark);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .admin-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+
+      .empty {
+        padding: 48px 18px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 900px) {
+        .admin-top {
+          align-items: start;
+          flex-direction: column;
+        }
+
+        .summary-grid,
+        .admin-grid,
+        .admin-split,
+        .form-row,
+        .work-row,
+        .lead-row,
+        .category-row,
+        .activity-row,
+        .source-row,
+        .popular-row {
+          grid-template-columns: 1fr;
+        }
+
+        .work-row img {
+          width: 100%;
+          height: 240px;
+        }
+
+        .row-actions {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-screen" data-login-screen>
+      <form class="login-card admin-form" data-login-form>
+        <div>
+          <p class="section-kicker">Admin Login</p>
+          <h1>관리자 로그인</h1>
+          <p>데모 계정: admin / portfolio</p>
+        </div>
+        <label>
+          <span>아이디</span>
+          <input name="user" type="text" autocomplete="username" required />
+        </label>
+        <label>
+          <span>비밀번호</span>
+          <input
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </label>
+        <button class="button primary" type="submit">로그인</button>
+        <p class="admin-status" data-login-status aria-live="polite"></p>
+      </form>
+    </div>
+
+    <header class="site-header is-scrolled">
+      <a class="brand" href="./index.html">Portfolio</a>
+      <nav class="nav" aria-label="주요 메뉴">
+        <a href="./index.html#about">About</a>
+        <a href="./work.html">Works</a>
+        <a href="./index.html#contact">Contact</a>
+      </nav>
+      <a class="header-cta" href="./index.html">사이트 보기</a>
+    </header>
+
+    <main class="admin-page">
+      <div class="admin-top">
+        <div>
+          <p class="section-kicker">Admin</p>
+          <h1>관리자 대시보드</h1>
+        </div>
+        <div class="admin-actions">
+          <a class="button ghost" href="./work.html">작업 페이지 보기</a>
+          <button class="button ghost" type="button" data-logout>로그아웃</button>
+        </div>
+      </div>
+
+      <div class="admin-tabs" aria-label="관리자 메뉴">
+        <button type="button" class="is-active" data-admin-tab="dashboard">
+          대시보드
+        </button>
+        <button type="button" data-admin-tab="works">작업물 관리</button>
+        <button type="button" data-admin-tab="leads">문의 내역</button>
+        <button type="button" data-admin-tab="categories">카테고리 관리</button>
+        <button type="button" data-admin-tab="analytics">방문 통계</button>
+      </div>
+
+      <section class="admin-panel is-active" data-admin-panel="dashboard">
+        <div class="summary-grid" data-summary-grid></div>
+        <div class="admin-split">
+          <div class="admin-card">
+            <h2>최근 활동</h2>
+            <div class="admin-table" data-activity-table></div>
+          </div>
+          <div class="admin-card">
+            <h2>인기 작업물</h2>
+            <div class="admin-table" data-popular-table></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-panel" data-admin-panel="works">
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h2>작업물 등록/수정</h2>
+            <form class="admin-form" data-work-form>
+              <input name="id" type="hidden" />
+              <label>
+                <span>카테고리</span>
+                <select name="category" data-category-select required></select>
+              </label>
+              <label>
+                <span>작업물 제목</span>
+                <input
+                  name="title"
+                  type="text"
+                  placeholder="예: 에어프라이어 상세페이지"
+                  required
+                />
+              </label>
+              <label>
+                <span>설명</span>
+                <textarea
+                  name="description"
+                  placeholder="작업물의 핵심 콘셉트나 특징을 입력해주세요."
+                ></textarea>
+              </label>
+              <div class="form-row">
+                <label>
+                  <span>정렬 순서</span>
+                  <input name="sortOrder" type="number" min="0" value="0" />
+                </label>
+                <label>
+                  <span>대표 이미지</span>
+                  <input name="image" type="file" accept="image/*" />
+                </label>
+              </div>
+              <label class="inline">
+                <input name="isPublished" type="checkbox" checked />
+                <span>작업 페이지에 공개</span>
+              </label>
+              <label class="inline">
+                <input name="isFeatured" type="checkbox" />
+                <span>메인/상단 노출</span>
+              </label>
+              <button class="button primary" type="submit">작업물 저장</button>
+              <button class="button ghost" type="button" data-reset-work-form>
+                새 작업물 입력
+              </button>
+              <p class="admin-status" data-work-status aria-live="polite"></p>
+              <p class="admin-note">
+                이미지는 로컬 데모 기준 1.5MB 이하를 권장합니다. 실제 운영 시
+                이미지 저장소로 연결하면 됩니다.
+              </p>
+            </form>
+          </div>
+
+          <div class="admin-table" data-managed-work-table></div>
+        </div>
+      </section>
+
+      <section class="admin-panel" data-admin-panel="leads">
+        <div class="admin-top">
+          <div>
+            <p class="section-kicker">Leads</p>
+            <h1>문의 접수 내역</h1>
+          </div>
+          <button class="button ghost" type="button" data-clear-leads>
+            전체 삭제
+          </button>
+        </div>
+        <div class="admin-table" data-lead-table></div>
+      </section>
+
+      <section class="admin-panel" data-admin-panel="categories">
+        <div class="admin-grid">
+          <div class="admin-card">
+            <h2>카테고리 추가</h2>
+            <form class="admin-form" data-category-form>
+              <label>
+                <span>카테고리 이름</span>
+                <input
+                  name="label"
+                  type="text"
+                  placeholder="예: 유아용품"
+                  required
+                />
+              </label>
+              <button class="button primary" type="submit">카테고리 추가</button>
+              <p class="admin-status" data-category-status aria-live="polite"></p>
+            </form>
+          </div>
+          <div class="admin-table" data-category-table></div>
+        </div>
+      </section>
+
+      <section class="admin-panel" data-admin-panel="analytics">
+        <div class="summary-grid" data-analytics-summary></div>
+        <div class="admin-split">
+          <div class="admin-card">
+            <h2>유입 경로</h2>
+            <div class="admin-table" data-source-table></div>
+          </div>
+          <div class="admin-card">
+            <h2>최근 활동</h2>
+            <div class="admin-table" data-analytics-activity-table></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
