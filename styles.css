@@ -1199,6 +1199,34 @@ h1 {
   background: rgba(255, 255, 255, 0.72);
 }
 
+.subcategory-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: -12px 0 34px;
+}
+
+.subcategory-tabs button {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  padding: 0 18px;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.subcategory-tabs button:hover,
+.subcategory-tabs button.is-active {
+  border-color: rgba(10, 132, 255, 0.5);
+  background: rgba(10, 132, 255, 0.12);
+  color: var(--accent);
+}
+
 .category-panel {
   display: none;
 }
@@ -1259,6 +1287,12 @@ h1 {
   color: var(--muted);
   font-size: 14px;
   line-height: 1.5;
+}
+
+.detail-card .work-meta {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .detail-thumb {
