@@ -1315,6 +1315,66 @@ h1 {
   object-fit: cover;
 }
 
+.detail-page {
+  background: #101010;
+  color: #f5f5f7;
+}
+
+.detail-view {
+  width: min(1440px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 150px 0 80px;
+}
+
+.detail-view-head {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 42px;
+}
+
+.detail-view-head h1 {
+  margin: 0;
+  color: #f5f5f7;
+  font-size: clamp(42px, 6vw, 82px);
+  line-height: 1.02;
+}
+
+.detail-view-head p {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(245, 245, 247, 0.62);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.detail-frame-shell {
+  position: relative;
+  overflow: hidden;
+  min-height: 760px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.detail-frame {
+  display: block;
+  width: 100%;
+  height: min(1400px, 120vh);
+  border: 0;
+  background: #fff;
+}
+
+.detail-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.detail-card[data-detail-url] {
+  cursor: pointer;
+}
+
 .thumb-living-1 { --thumb-bg: linear-gradient(155deg, #1d1d1f, #8697a4 55%, #e8eef2); }
 .thumb-living-2 { --thumb-bg: linear-gradient(155deg, #eff3f0, #9fb7a8 62%, #25342e); }
 .thumb-living-3 { --thumb-bg: linear-gradient(155deg, #f7f7f4, #d7d2c7 58%, #111112); }
