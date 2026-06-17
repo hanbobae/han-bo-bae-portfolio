@@ -402,6 +402,14 @@ const readFileAsDataUrl = (file) =>
     reader.readAsDataURL(file);
   });
 
+const readFileAsText = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => resolve(reader.result));
+    reader.addEventListener("error", reject);
+    reader.readAsText(file);
+  });
+
 const fillCategorySelects = () => {
   const options = readCategories()
     .map(
@@ -436,8 +444,10 @@ if (workForm) {
     const formData = new FormData(workForm);
     const id = formData.get("id");
     const imageFile = formData.get("image");
+    const detailFile = formData.get("detailFile");
     const existing = readWorks().find((work) => work.id === id);
     let image = existing?.image || "";
+    let detailHtml = String(formData.get("detailHtml") || "").trim();
 
     if (imageFile instanceof File && imageFile.size > 0) {
       if (imageFile.size > 1.5 * 1024 * 1024) {
@@ -446,6 +456,14 @@ if (workForm) {
         return;
       }
       image = await readFileAsDataUrl(imageFile);
+    }
+
+    if (detailFile instanceof File && detailFile.size > 0) {
+      if (detailFile.size > 2 * 1024 * 1024) {
+        workStatus.textContent = "HTML 파일은 2MB 이하를 권장합니다.";
+        return;
+      }
+      detailHtml = String(await readFileAsText(detailFile)).trim();
     }
 
     if (!image) {
@@ -460,6 +478,7 @@ if (workForm) {
       category: formData.get("category"),
       title: formData.get("title"),
       description: formData.get("description"),
+      detailHtml,
       image,
       sortOrder: Number(formData.get("sortOrder") || 0),
       isPublished: formData.get("isPublished") === "on",
@@ -512,6 +531,13 @@ const renderUploadedWorks = () => {
       card.dataset.uploadedWork = work.id;
       card.dataset.workId = work.id;
       card.dataset.workTitle = work.title;
+      if (work.detailHtml) {
+        card.dataset.detailUrl = `./detail.html?id=${encodeURIComponent(
+          work.id
+        )}`;
+        card.setAttribute("role", "link");
+        card.tabIndex = 0;
+      }
       card.innerHTML = `
         <div class="detail-thumb has-image">
           <img src="${work.image}" alt="${escapeHtml(work.title)}" />
@@ -534,6 +560,9 @@ const createHomeWorkSlide = (work, index) => {
   const hasImage = Boolean(work.image);
   const thumbClass = hasImage ? "has-image" : work.thumbClass || "thumb-living-1";
   const title = work.title || "포트폴리오 작업물";
+  const href = work.detailHtml
+    ? `./detail.html?id=${encodeURIComponent(work.id)}`
+    : "./work.html";
   const description =
     work.description ||
     `${categoryLabel(work.category)} 카테고리의 상세페이지 작업물입니다.`;
@@ -541,7 +570,7 @@ const createHomeWorkSlide = (work, index) => {
   return `
     <a
       class="work-slide detail-card"
-      href="./work.html"
+      href="${href}"
       data-slider-work="${escapeHtml(work.id || `default-${index}`)}"
       data-work-id="${escapeHtml(work.id || `default-${index}`)}"
       data-work-title="${escapeHtml(title)}"
@@ -621,6 +650,35 @@ const renderFeaturedWorks = () => {
   });
 };
 
+const renderWorkDetailPage = () => {
+  const frame = document.querySelector("[data-detail-frame]");
+  if (!frame) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+  const work = readWorks().find((item) => item.id === id);
+  const title = document.querySelector("[data-detail-title]");
+  const description = document.querySelector("[data-detail-description]");
+  const empty = document.querySelector("[data-detail-empty]");
+
+  if (title) title.textContent = work?.title || "작업물 상세페이지";
+  if (description) {
+    description.textContent =
+      work?.description ||
+      "관리자 페이지에서 등록한 HTML 상세페이지를 확인할 수 있습니다.";
+  }
+
+  if (!work?.detailHtml) {
+    frame.hidden = true;
+    if (empty) empty.hidden = false;
+    return;
+  }
+
+  frame.hidden = false;
+  if (empty) empty.hidden = true;
+  frame.srcdoc = work.detailHtml;
+};
+
 const trackWorkClick = (card) => {
   const title =
     card.dataset.workTitle ||
@@ -638,7 +696,23 @@ const trackWorkClick = (card) => {
 
 document.addEventListener("click", (event) => {
   const card = event.target.closest(".detail-card, .work-card");
-  if (card) trackWorkClick(card);
+  if (!card) return;
+  trackWorkClick(card);
+  if (
+    card.dataset.detailUrl &&
+    !event.target.closest("a, button, input, textarea, select")
+  ) {
+    window.location.href = card.dataset.detailUrl;
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const card = event.target.closest?.("[data-detail-url]");
+  if (!card) return;
+  event.preventDefault();
+  trackWorkClick(card);
+  window.location.href = card.dataset.detailUrl;
 });
 
 specialCards.forEach((card) => {
@@ -879,7 +953,8 @@ const renderManagedWorks = () => {
             <p>
               ${work.isPublished === false ? "비공개" : "공개"} ·
               ${work.isFeatured ? "메인 노출" : "일반"} ·
-              정렬 ${Number(work.sortOrder || 0)}
+              정렬 ${Number(work.sortOrder || 0)} ·
+              ${work.detailHtml ? "HTML 상세 있음" : "HTML 상세 없음"}
             </p>
           </div>
           <div class="row-actions">
@@ -916,6 +991,9 @@ managedWorkTable?.addEventListener("click", (event) => {
     workForm.elements.category.value = work.category;
     workForm.elements.title.value = work.title;
     workForm.elements.description.value = work.description || "";
+    if (workForm.elements.detailHtml) {
+      workForm.elements.detailHtml.value = work.detailHtml || "";
+    }
     workForm.elements.sortOrder.value = work.sortOrder || 0;
     workForm.elements.isPublished.checked = work.isPublished !== false;
     workForm.elements.isFeatured.checked = Boolean(work.isFeatured);
@@ -1142,5 +1220,6 @@ renderAdmin();
 renderUploadedWorks();
 renderHomeWorkSlider();
 renderFeaturedWorks();
+renderWorkDetailPage();
 
 window.addEventListener("resize", updateHomeWorkSliderSize);
