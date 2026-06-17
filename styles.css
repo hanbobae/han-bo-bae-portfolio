@@ -827,8 +827,8 @@ h1 {
 .special-card:hover,
 .special-card:focus-within,
 .special-card.is-open {
-  height: 610px;
-  min-height: 610px;
+  height: 500px;
+  min-height: 500px;
 }
 
 .special-card-head {
@@ -877,8 +877,8 @@ h1 {
 .special-card:hover .special-card-body,
 .special-card:focus-within .special-card-body,
 .special-card.is-open .special-card-body {
-  max-height: 520px;
-  margin-top: 34px;
+  max-height: 340px;
+  margin-top: 30px;
   opacity: 1;
   transform: translateY(0);
 }
