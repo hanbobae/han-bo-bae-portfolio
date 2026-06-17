@@ -9,7 +9,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
     />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260617d" />
     <style>
       body {
         min-height: 100vh;
@@ -213,6 +213,14 @@
         min-height: 104px;
         resize: vertical;
         padding: 14px;
+      }
+
+      .admin-form .code-textarea {
+        min-height: 220px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 13px;
+        line-height: 1.55;
+        white-space: pre;
       }
 
       .admin-form input[type="file"],
@@ -450,6 +458,15 @@
                   placeholder="작업물의 핵심 콘셉트나 특징을 입력해주세요."
                 ></textarea>
               </label>
+              <label>
+                <span>상세페이지 HTML 코드</span>
+                <textarea
+                  class="code-textarea"
+                  name="detailHtml"
+                  placeholder="상세페이지 전체 HTML 또는 body 안에 들어갈 코드를 붙여넣어 주세요."
+                  spellcheck="false"
+                ></textarea>
+              </label>
               <div class="form-row">
                 <label>
                   <span>정렬 순서</span>
@@ -460,6 +477,10 @@
                   <input name="image" type="file" accept="image/*" />
                 </label>
               </div>
+              <label>
+                <span>HTML 파일 불러오기</span>
+                <input name="detailFile" type="file" accept=".html,text/html" />
+              </label>
               <label class="inline">
                 <input name="isPublished" type="checkbox" checked />
                 <span>작업 페이지에 공개</span>
@@ -476,6 +497,9 @@
               <p class="admin-note">
                 이미지는 로컬 데모 기준 1.5MB 이하를 권장합니다. 실제 운영 시
                 이미지 저장소로 연결하면 됩니다.
+              </p>
+              <p class="admin-note">
+                HTML 코드는 이 브라우저 저장소에 저장됩니다. 실제 방문자에게 동일하게 보여주려면 DB 연동이 필요합니다.
               </p>
             </form>
           </div>
@@ -534,6 +558,6 @@
       </section>
     </main>
 
-    <script src="./script.js"></script>
+    <script src="./script.js?v=20260617d"></script>
   </body>
 </html>
