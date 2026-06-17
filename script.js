@@ -43,110 +43,24 @@ const activityStorageKey = "portfolioActivity";
 const authStorageKey = "portfolioAdminAuthed";
 
 const defaultCategories = [
-  { id: "living", label: "생활가전/용품", locked: true },
-  { id: "kitchen", label: "주방가전", locked: true },
-  { id: "beauty", label: "미용/패션", locked: true },
-  { id: "food", label: "푸드/헬스", locked: true },
+  { id: "all", label: "전체 보기", locked: true },
+  { id: "detail", label: "상세페이지", locked: true },
+  { id: "branding", label: "브랜딩", locked: true },
+  { id: "photo", label: "제품촬영", locked: true },
+  { id: "video", label: "영상편집", locked: true },
 ];
 
-const defaultWorkItems = [
-  {
-    id: "living-1",
-    category: "living",
-    title: "무선 청소기 상세페이지",
-    thumbClass: "thumb-living-1",
-  },
-  {
-    id: "living-2",
-    category: "living",
-    title: "공기청정기 상세페이지",
-    thumbClass: "thumb-living-2",
-  },
-  {
-    id: "living-3",
-    category: "living",
-    title: "스마트 조명 상세페이지",
-    thumbClass: "thumb-living-3",
-  },
-  {
-    id: "living-4",
-    category: "living",
-    title: "생활 수납용품 상세페이지",
-    thumbClass: "thumb-living-4",
-  },
-  {
-    id: "kitchen-1",
-    category: "kitchen",
-    title: "에어프라이어 상세페이지",
-    thumbClass: "thumb-kitchen-1",
-  },
-  {
-    id: "kitchen-2",
-    category: "kitchen",
-    title: "블렌더 상세페이지",
-    thumbClass: "thumb-kitchen-2",
-  },
-  {
-    id: "kitchen-3",
-    category: "kitchen",
-    title: "커피머신 상세페이지",
-    thumbClass: "thumb-kitchen-3",
-  },
-  {
-    id: "kitchen-4",
-    category: "kitchen",
-    title: "인덕션 상세페이지",
-    thumbClass: "thumb-kitchen-4",
-  },
-  {
-    id: "beauty-1",
-    category: "beauty",
-    title: "헤어 디바이스 상세페이지",
-    thumbClass: "thumb-beauty-1",
-  },
-  {
-    id: "beauty-2",
-    category: "beauty",
-    title: "스킨케어 상세페이지",
-    thumbClass: "thumb-beauty-2",
-  },
-  {
-    id: "beauty-3",
-    category: "beauty",
-    title: "패션 잡화 상세페이지",
-    thumbClass: "thumb-beauty-3",
-  },
-  {
-    id: "beauty-4",
-    category: "beauty",
-    title: "뷰티 툴 상세페이지",
-    thumbClass: "thumb-beauty-4",
-  },
-  {
-    id: "food-1",
-    category: "food",
-    title: "건강식품 상세페이지",
-    thumbClass: "thumb-food-1",
-  },
-  {
-    id: "food-2",
-    category: "food",
-    title: "프로틴 상세페이지",
-    thumbClass: "thumb-food-2",
-  },
-  {
-    id: "food-3",
-    category: "food",
-    title: "간편식 상세페이지",
-    thumbClass: "thumb-food-3",
-  },
-  {
-    id: "food-4",
-    category: "food",
-    title: "헬스케어 상세페이지",
-    thumbClass: "thumb-food-4",
-  },
+const detailSubcategories = [
+  { id: "all", label: "all" },
+  { id: "living", label: "생활가전/용품" },
+  { id: "kitchen", label: "주방가전" },
+  { id: "beauty", label: "뷰티/패션" },
+  { id: "food", label: "푸드/헬스" },
 ];
+
+const legacyDetailCategories = ["living", "kitchen", "beauty", "food"];
+
+const defaultWorkItems = [];
 
 const revealObserver = new IntersectionObserver(
   (entries) => {
@@ -181,7 +95,16 @@ const readLeads = () => readJson(leadStorageKey, []);
 const writeLeads = (leads) => writeJson(leadStorageKey, leads);
 const readWorks = () => readJson(workStorageKey, []);
 const writeWorks = (works) => writeJson(workStorageKey, works);
-const readCategories = () => readJson(categoryStorageKey, defaultCategories);
+const readCategories = () => {
+  const stored = readJson(categoryStorageKey, []);
+  const custom = stored.filter(
+    (category) =>
+      !category.locked &&
+      !defaultCategories.some((item) => item.id === category.id) &&
+      !legacyDetailCategories.includes(category.id)
+  );
+  return [...defaultCategories, ...custom];
+};
 const writeCategories = (categories) =>
   writeJson(categoryStorageKey, categories);
 const readAnalytics = () =>
@@ -204,6 +127,21 @@ const escapeHtml = (value) =>
 
 const categoryLabel = (id) =>
   readCategories().find((category) => category.id === id)?.label || id;
+
+const detailSubcategoryLabel = (id) =>
+  detailSubcategories.find((category) => category.id === id)?.label || id;
+
+const normalizeWork = (work) => {
+  if (legacyDetailCategories.includes(work.category)) {
+    return { ...work, category: "detail", detailCategory: work.category };
+  }
+  return {
+    ...work,
+    detailCategory: work.category === "detail" ? work.detailCategory || "all" : "",
+  };
+};
+
+const readNormalizedWorks = () => readWorks().map(normalizeWork);
 
 const getTrafficSource = () => {
   const params = new URLSearchParams(window.location.search);
@@ -412,6 +350,7 @@ const readFileAsText = (file) =>
 
 const fillCategorySelects = () => {
   const options = readCategories()
+    .filter((category) => category.id !== "all")
     .map(
       (category) =>
         `<option value="${escapeHtml(category.id)}">${escapeHtml(
@@ -476,6 +415,10 @@ if (workForm) {
       createdAt: existing?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       category: formData.get("category"),
+      detailCategory:
+        formData.get("category") === "detail"
+          ? formData.get("detailCategory") || "all"
+          : "",
       title: formData.get("title"),
       description: formData.get("description"),
       detailHtml,
@@ -508,6 +451,43 @@ if (workForm) {
 
 resetWorkFormButton?.addEventListener("click", resetWorkForm);
 
+const createUploadedWorkCard = (work) => {
+  const card = document.createElement("article");
+  card.className = "detail-card";
+  card.dataset.uploadedWork = work.id;
+  card.dataset.workId = work.id;
+  card.dataset.workTitle = work.title;
+  if (work.category === "detail") {
+    card.dataset.detailSubcategory = work.detailCategory || "all";
+  }
+  if (work.detailHtml) {
+    card.dataset.detailUrl = `./detail.html?id=${encodeURIComponent(work.id)}`;
+    card.setAttribute("role", "link");
+    card.tabIndex = 0;
+  }
+  card.innerHTML = `
+    <div class="detail-thumb has-image">
+      <img src="${work.image}" alt="${escapeHtml(work.title)}" />
+    </div>
+    <strong>${escapeHtml(work.title)}</strong>
+    ${work.description ? `<p>${escapeHtml(work.description)}</p>` : ""}
+    ${
+      work.category === "detail" && work.detailCategory
+        ? `<p class="work-meta">${escapeHtml(detailSubcategoryLabel(work.detailCategory))}</p>`
+        : ""
+    }
+  `;
+  return card;
+};
+
+const filterDetailCards = (subcategory = "all") => {
+  document
+    .querySelectorAll('[data-category-panel="detail"] [data-detail-subcategory]')
+    .forEach((card) => {
+      card.hidden = subcategory !== "all" && card.dataset.detailSubcategory !== subcategory;
+    });
+};
+
 const renderUploadedWorks = () => {
   syncWorkCategories();
   if (document.querySelectorAll("[data-category-panel]").length === 0) return;
@@ -516,42 +496,31 @@ const renderUploadedWorks = () => {
     card.remove();
   });
 
-  readWorks()
+  const works = readNormalizedWorks()
     .filter((work) => work.isPublished !== false)
-    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-    .forEach((work) => {
-      const panel = document.querySelector(
-        `[data-category-panel="${work.category}"]`
-      );
-      const grid = panel?.querySelector(".detail-grid");
-      if (!grid) return;
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
-      const card = document.createElement("article");
-      card.className = "detail-card";
-      card.dataset.uploadedWork = work.id;
-      card.dataset.workId = work.id;
-      card.dataset.workTitle = work.title;
-      if (work.detailHtml) {
-        card.dataset.detailUrl = `./detail.html?id=${encodeURIComponent(
-          work.id
-        )}`;
-        card.setAttribute("role", "link");
-        card.tabIndex = 0;
-      }
-      card.innerHTML = `
-        <div class="detail-thumb has-image">
-          <img src="${work.image}" alt="${escapeHtml(work.title)}" />
-        </div>
-        <strong>${escapeHtml(work.title)}</strong>
-        ${work.description ? `<p>${escapeHtml(work.description)}</p>` : ""}
-      `;
-      grid.appendChild(card);
-    });
+  works.forEach((work) => {
+    const allGrid = document.querySelector('[data-category-panel="all"] .detail-grid');
+    allGrid?.appendChild(createUploadedWorkCard(work));
+
+    const panel = document.querySelector(
+      `[data-category-panel="${work.category}"]`
+    );
+    const grid = panel?.querySelector(".detail-grid");
+    if (!grid || work.category === "all") return;
+    grid.appendChild(createUploadedWorkCard(work));
+  });
+
+  const activeSubcategory =
+    document.querySelector("[data-subcategory-tab].is-active")?.dataset
+      .subcategoryTab || "all";
+  filterDetailCards(activeSubcategory);
 };
 
 const getHomeWorkItems = () => [
   ...defaultWorkItems,
-  ...readWorks()
+  ...readNormalizedWorks()
     .filter((work) => work.isPublished !== false)
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)),
 ];
@@ -625,7 +594,7 @@ const renderFeaturedWorks = () => {
     card.remove();
   });
 
-  const featured = readWorks()
+  const featured = readNormalizedWorks()
     .filter((work) => work.isPublished !== false && work.isFeatured)
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
     .slice(0, 3);
@@ -848,6 +817,17 @@ document.querySelector(".category-tabs")?.addEventListener("click", (event) => {
   });
 });
 
+document.querySelector(".subcategory-tabs")?.addEventListener("click", (event) => {
+  const tabButton = event.target.closest("[data-subcategory-tab]");
+  if (!tabButton) return;
+  const subcategory = tabButton.dataset.subcategoryTab;
+
+  document.querySelectorAll("[data-subcategory-tab]").forEach((button) => {
+    button.classList.toggle("is-active", button === tabButton);
+  });
+  filterDetailCards(subcategory);
+});
+
 adminTabs.forEach((tabButton) => {
   tabButton.addEventListener("click", () => {
     const panelId = tabButton.dataset.adminTab;
@@ -933,7 +913,7 @@ clearLeads?.addEventListener("click", () => {
 const renderManagedWorks = () => {
   if (!managedWorkTable) return;
 
-  const works = readWorks();
+  const works = readNormalizedWorks();
   if (works.length === 0) {
     managedWorkTable.innerHTML =
       '<div class="empty">아직 등록된 작업물이 없습니다.</div>';
@@ -984,11 +964,16 @@ managedWorkTable?.addEventListener("click", (event) => {
   const deleteButton = event.target.closest("[data-delete-work]");
 
   if (editButton) {
-    const work = readWorks().find((item) => item.id === editButton.dataset.editWork);
+    const work = readNormalizedWorks().find(
+      (item) => item.id === editButton.dataset.editWork
+    );
     if (!work || !workForm) return;
     fillCategorySelects();
     workForm.elements.id.value = work.id;
     workForm.elements.category.value = work.category;
+    if (workForm.elements.detailCategory) {
+      workForm.elements.detailCategory.value = work.detailCategory || "all";
+    }
     workForm.elements.title.value = work.title;
     workForm.elements.description.value = work.description || "";
     if (workForm.elements.detailHtml) {
