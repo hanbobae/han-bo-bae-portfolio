@@ -288,7 +288,7 @@ h1 {
 
 .hero-visual {
   justify-self: end;
-  width: min(100%, 500px);
+  width: min(100%, 560px);
 }
 
 .compass-visual {
@@ -296,50 +296,152 @@ h1 {
   display: grid;
   place-items: center;
   min-height: 620px;
+  perspective: 1200px;
 }
 
 .compass-glow {
   position: absolute;
-  width: min(82vw, 520px);
+  width: min(82vw, 560px);
   aspect-ratio: 1;
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(10, 132, 255, 0.28), transparent 58%),
-    radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 68%);
-  filter: blur(18px);
-  opacity: 0.9;
+    radial-gradient(circle, rgba(10, 132, 255, 0.34), transparent 56%),
+    radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 70%);
+  filter: blur(24px);
+  opacity: 0.78;
   animation: compassGlow 5.8s ease-in-out infinite;
 }
 
-.compass-image {
+.metal-compass {
   position: relative;
   z-index: 1;
   width: min(56vw, 560px);
-  max-width: none;
   opacity: 0;
-  filter:
-    drop-shadow(0 34px 70px rgba(0, 0, 0, 0.46))
-    drop-shadow(0 0 34px rgba(10, 132, 255, 0.16));
-  transform-origin: 50% 52%;
+  transform-style: preserve-3d;
+  transform-origin: 50% 56%;
+  --compass-transform: translate3d(0, 0, 0) rotateX(9deg) rotateY(-16deg) rotateZ(-5deg) scale(1);
   animation:
     compassAppear 1.6s ease-out 0.35s forwards,
     compassFloat 6.4s ease-in-out 1.55s infinite;
-  will-change: transform;
+  will-change: transform, opacity;
+}
+
+.metal-compass-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.metal-shadow {
+  fill: rgba(0, 0, 0, 0.38);
+  filter: blur(12px);
+}
+
+.compass-ring ellipse:first-child,
+.compass-ring rect {
+  fill: url(#metalRim);
+  stroke: rgba(255, 255, 255, 0.46);
+  stroke-width: 3;
+}
+
+.compass-ring ellipse:nth-child(2) {
+  fill: rgba(8, 9, 10, 0.92);
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-width: 3;
+}
+
+.rim-inner {
+  fill: rgba(12, 14, 16, 0.82);
+  stroke: rgba(255, 255, 255, 0.48);
+  stroke-width: 4;
+}
+
+.face-line,
+.tick-ring line,
+.degree-lines path,
+.degree-lines circle {
+  stroke: rgba(255, 255, 255, 0.78);
+  stroke-linecap: round;
+}
+
+.face-line {
+  stroke-width: 2;
+  opacity: 0.35;
+}
+
+.tick-ring line {
+  stroke-width: 7;
+}
+
+.degree-lines path,
+.degree-lines circle {
+  fill: none;
+  stroke-width: 3;
+  opacity: 0.52;
+}
+
+.cardinal {
+  fill: rgba(255, 255, 255, 0.92);
+  font-family: "Pretendard", "Inter", sans-serif;
+  font-size: 58px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.cardinal.small {
+  font-size: 48px;
+}
+
+.cardinal.mini {
+  font-size: 29px;
+  opacity: 0.88;
+}
+
+.compass-needle {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: needleDrift 4.6s ease-in-out infinite;
+}
+
+.needle-hub {
+  fill: url(#metalRim);
+  stroke: rgba(255, 255, 255, 0.52);
+  stroke-width: 3;
+}
+
+.needle-dot {
+  fill: #edf1f4;
+  opacity: 0.94;
+}
+
+.needle-red {
+  fill: #c94f54;
+}
+
+.needle-green {
+  fill: #53a96b;
+}
+
+.glass-layer {
+  opacity: 0.36;
+  mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 @keyframes compassAppear {
   0% {
     opacity: 0;
-    transform: translate3d(0, 18px, 0) scale(0.96) rotate(-2deg);
+    transform: translate3d(0, 22px, 0) rotateX(5deg) rotateY(-8deg) rotateZ(-8deg) scale(0.94);
   }
 
-  58% {
-    opacity: 0.42;
+  46% {
+    opacity: 0.34;
   }
 
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1) rotate(-1.2deg);
+    transform: var(--compass-transform);
   }
 }
 
@@ -347,12 +449,23 @@ h1 {
   0%,
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(-1.2deg);
+    transform: var(--compass-transform);
   }
 
   50% {
-    opacity: 0.86;
-    transform: translate3d(0, -24px, 0) rotate(1.4deg);
+    opacity: 0.88;
+    transform: var(--compass-transform) translate3d(0, -22px, 20px);
+  }
+}
+
+@keyframes needleDrift {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+
+  50% {
+    transform: rotate(7deg);
   }
 }
 
@@ -1442,7 +1555,7 @@ h1 {
     min-height: 520px;
   }
 
-  .compass-image {
+  .metal-compass {
     width: min(86vw, 500px);
   }
 
@@ -1577,7 +1690,7 @@ h1 {
     min-height: 430px;
   }
 
-  .compass-image {
+  .metal-compass {
     width: min(98vw, 430px);
   }
 
