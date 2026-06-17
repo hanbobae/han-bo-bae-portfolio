@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Works | Web Design Portfolio</title>
+    <title>Works | Han bo bae Portfolio</title>
     <meta
       name="description"
-      content="웹디자인 포트폴리오 작업 사례 페이지"
+      content="한보배 웹디자인 포트폴리오 작업물 페이지"
     />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260617d" />
+    <link rel="stylesheet" href="./styles.css?v=20260617e" />
   </head>
   <body>
     <div class="noise" aria-hidden="true"></div>
@@ -26,139 +26,84 @@
         <a href="./work.html" aria-current="page">Works</a>
         <a href="./index.html#contact">Contact</a>
       </nav>
-      <a class="header-cta" href="./index.html#contact">문의하기</a>
     </header>
 
     <main>
       <section class="section work-page-hero">
         <p class="eyebrow reveal">Selected Works</p>
         <h1 class="reveal">
-          상세페이지 디자인<br />
-          카테고리별 포트폴리오
+          목적에 따라 정리한<br />
+          포트폴리오 작업물
         </h1>
         <p class="hero-description reveal">
-          제품군의 특성과 구매 맥락에 맞춰 기획, 카피, 시각 흐름을 설계한
-          상세페이지 작업을 카테고리별로 정리했습니다.
+          상세페이지, 브랜딩, 제품촬영, 영상편집 작업을 목적별로 나누고,
+          상세페이지는 제품군에 따라 다시 확인할 수 있도록 구성했습니다.
         </p>
       </section>
 
       <section class="section category-work reveal" data-work-page>
-        <div class="category-tabs" aria-label="작업 카테고리">
-          <button type="button" class="is-active" data-category-tab="living">
-            생활가전/용품
-          </button>
-          <button type="button" data-category-tab="kitchen">주방가전</button>
-          <button type="button" data-category-tab="beauty">미용/패션</button>
-          <button type="button" data-category-tab="food">푸드/헬스</button>
+        <div class="category-tabs main-category-tabs" aria-label="대카테고리">
+          <button type="button" class="is-active" data-category-tab="all">전체 보기</button>
+          <button type="button" data-category-tab="detail">상세페이지</button>
+          <button type="button" data-category-tab="branding">브랜딩</button>
+          <button type="button" data-category-tab="photo">제품촬영</button>
+          <button type="button" data-category-tab="video">영상편집</button>
         </div>
 
-        <div class="category-panel is-active" data-category-panel="living">
+        <div class="category-panel is-active" data-category-panel="all">
+          <div class="category-heading">
+            <span>All</span>
+            <h2>전체 보기</h2>
+          </div>
+          <div class="detail-grid"></div>
+        </div>
+
+        <div class="category-panel" data-category-panel="detail">
           <div class="category-heading">
             <span>01</span>
-            <h2>생활가전/용품</h2>
+            <h2>상세페이지</h2>
           </div>
-          <div class="detail-grid">
-            <article class="detail-card">
-              <div class="detail-thumb thumb-living-1"></div>
-              <strong>무선 청소기 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-living-2"></div>
-              <strong>공기청정기 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-living-3"></div>
-              <strong>스마트 조명 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-living-4"></div>
-              <strong>생활 수납용품 상세페이지</strong>
-            </article>
+          <div class="subcategory-tabs" aria-label="상세페이지 하위 카테고리">
+            <button type="button" class="is-active" data-subcategory-tab="all">all</button>
+            <button type="button" data-subcategory-tab="living">생활가전/용품</button>
+            <button type="button" data-subcategory-tab="kitchen">주방가전</button>
+            <button type="button" data-subcategory-tab="beauty">뷰티/패션</button>
+            <button type="button" data-subcategory-tab="food">푸드/헬스</button>
           </div>
+          <div class="detail-grid" data-detail-grid="all"></div>
         </div>
 
-        <div class="category-panel" data-category-panel="kitchen">
+        <div class="category-panel" data-category-panel="branding">
           <div class="category-heading">
             <span>02</span>
-            <h2>주방가전</h2>
+            <h2>브랜딩</h2>
           </div>
-          <div class="detail-grid">
-            <article class="detail-card">
-              <div class="detail-thumb thumb-kitchen-1"></div>
-              <strong>에어프라이어 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-kitchen-2"></div>
-              <strong>블렌더 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-kitchen-3"></div>
-              <strong>커피머신 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-kitchen-4"></div>
-              <strong>인덕션 상세페이지</strong>
-            </article>
-          </div>
+          <div class="detail-grid"></div>
         </div>
 
-        <div class="category-panel" data-category-panel="beauty">
+        <div class="category-panel" data-category-panel="photo">
           <div class="category-heading">
             <span>03</span>
-            <h2>미용/패션</h2>
+            <h2>제품촬영</h2>
           </div>
-          <div class="detail-grid">
-            <article class="detail-card">
-              <div class="detail-thumb thumb-beauty-1"></div>
-              <strong>헤어 디바이스 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-beauty-2"></div>
-              <strong>스킨케어 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-beauty-3"></div>
-              <strong>패션 잡화 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-beauty-4"></div>
-              <strong>뷰티 툴 상세페이지</strong>
-            </article>
-          </div>
+          <div class="detail-grid"></div>
         </div>
 
-        <div class="category-panel" data-category-panel="food">
+        <div class="category-panel" data-category-panel="video">
           <div class="category-heading">
             <span>04</span>
-            <h2>푸드/헬스</h2>
+            <h2>영상편집</h2>
           </div>
-          <div class="detail-grid">
-            <article class="detail-card">
-              <div class="detail-thumb thumb-food-1"></div>
-              <strong>건강식품 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-food-2"></div>
-              <strong>프로틴 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-food-3"></div>
-              <strong>간편식 상세페이지</strong>
-            </article>
-            <article class="detail-card">
-              <div class="detail-thumb thumb-food-4"></div>
-              <strong>헬스케어 상세페이지</strong>
-            </article>
-          </div>
+          <div class="detail-grid"></div>
         </div>
       </section>
     </main>
 
     <footer class="footer">
-      <span>© 2026 Web Design Portfolio</span>
+      <span>© 2026 Han bo bae Portfolio</span>
       <a href="./index.html#contact">Contact</a>
     </footer>
 
-    <script src="./script.js?v=20260617d"></script>
+    <script src="./script.js?v=20260617e"></script>
   </body>
 </html>
