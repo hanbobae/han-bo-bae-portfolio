@@ -32,6 +32,8 @@ const popularTable = document.querySelector("[data-popular-table]");
 const sourceTable = document.querySelector("[data-source-table]");
 const marqueeRows = document.querySelectorAll("[data-marquee-row]");
 const specialCards = document.querySelectorAll(".special-card");
+const metalCompass = document.querySelector("[data-metal-compass]");
+const heroSection = document.querySelector(".hero");
 
 const leadStorageKey = "portfolioLeads";
 const workStorageKey = "portfolioWorks";
@@ -260,6 +262,55 @@ const updateHeader = () => {
 
 updateHeader();
 window.addEventListener("scroll", updateHeader, { passive: true });
+
+const compassMotion = {
+  pointerX: 0,
+  pointerY: 0,
+  scroll: 0,
+};
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const updateCompassMotion = () => {
+  if (!metalCompass) return;
+  if (heroSection) {
+    const rect = heroSection.getBoundingClientRect();
+    compassMotion.scroll = clamp(-rect.top / Math.max(rect.height * 0.82, 1), 0, 1);
+  }
+
+  const rotateX = 9 - compassMotion.scroll * 18 - compassMotion.pointerY * 5;
+  const rotateY = -16 + compassMotion.scroll * 30 + compassMotion.pointerX * 7;
+  const rotateZ = -5 + compassMotion.scroll * 88;
+  const translateY = -compassMotion.scroll * 34;
+  const scale = 1 - compassMotion.scroll * 0.04;
+
+  metalCompass.style.setProperty(
+    "--compass-transform",
+    `translate3d(0, ${translateY}px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) scale(${scale})`
+  );
+};
+
+if (metalCompass) {
+  updateCompassMotion();
+  window.addEventListener("scroll", updateCompassMotion, { passive: true });
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      compassMotion.pointerX = clamp(
+        (event.clientX / window.innerWidth - 0.5) * 2,
+        -1,
+        1
+      );
+      compassMotion.pointerY = clamp(
+        (event.clientY / window.innerHeight - 0.5) * 2,
+        -1,
+        1
+      );
+      updateCompassMotion();
+    },
+    { passive: true }
+  );
+}
 
 if (cursor) {
   window.addEventListener("pointermove", (event) => {
