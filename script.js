@@ -43,7 +43,6 @@ const activityStorageKey = "portfolioActivity";
 const authStorageKey = "portfolioAdminAuthed";
 
 const defaultCategories = [
-  { id: "all", label: "전체 보기", locked: true },
   { id: "detail", label: "상세페이지", locked: true },
   { id: "branding", label: "브랜딩", locked: true },
   { id: "photo", label: "제품촬영", locked: true },
@@ -501,8 +500,6 @@ const renderUploadedWorks = () => {
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
   works.forEach((work) => {
-    const allGrid = document.querySelector('[data-category-panel="all"] .detail-grid');
-    allGrid?.appendChild(createUploadedWorkCard(work));
 
     const panel = document.querySelector(
       `[data-category-panel="${work.category}"]`
